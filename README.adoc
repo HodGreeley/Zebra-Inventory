@@ -1,0 +1,29 @@
+= Zebra Datawedge/Couchbase Mobile Integration Demo
+
+This application implements a simple inventory scanning capability.
+
+The data consists of information about a fictitious set of books.
+Scanning the included ISBN bar codes pulls up the information from the Couchbase Lite embedded database.
+It relies on the Zebra Datawedge service for ISBN barcode scanning.
+
+The book covers were created using Canva (https://www.canva.com/).
+All book cover images are from Unsplash (https://unsplash.com/), and have generously been placed in the public domain.
+Inclusion in this work does not imply additional rights beyond those granted by the copyright holders.
+
+This overall project, as applicable, is released under terms of the Apache 2.0 License.
+See `LICENSE` for details.
+
+== Instructions
+
+Load the included data into Couchbase Server using link:https://developer.couchbase.com/documentation/server/current/cli/restore-cbrestore.html[`cbrestore`].
+Note the original export with cbbackup was done under macOS.
+There may be extra flags needed to restore the data under Linux or Windows.
+
+Run Couchbase Sync Gateway with the included configuration file.
+
+Open the android folder in Android Studio, build, and install the app on an appropriate Zebra device.
+(This application was originally built and test on a Zebra TC56 device.)
+
+Scan the included barcodes.
+The one named "missing" has no associated book in the original data.
+The other three barcodes will bring up different books.

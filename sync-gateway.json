@@ -1,0 +1,16 @@
+{
+  "log": ["*"],
+  "databases": {
+    "inventory": {
+      "server": "http://localhost:8091",
+      "bucket": "inventory",
+      "username": "Administrator",
+      "password": "Password",
+      "users": { "GUEST": { "disabled": false, "admin_channels": ["*"] } },
+      "allow_conflicts": false,
+      "revs_limit": 20,
+      "enable_shared_bucket_access": true,
+      "import_docs": "continuous"
+    }
+  }
+}

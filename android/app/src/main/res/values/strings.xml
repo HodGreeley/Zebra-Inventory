@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Zebra Inventory</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_header">Title</string>
+    <string name="author_header">Author</string>
+    <string name="isbn_header">ISBN</string>
+    <string name="btn_scan">Scan</string>
+</resources>
