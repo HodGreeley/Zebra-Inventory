@@ -7,7 +7,7 @@ Scanning the included ISBN bar codes pulls up the information from the link:http
 It relies on the link:https://www.zebra.com/us/en/products/software/mobile-computers/datawedge.html[Zebra Datawedge] service for ISBN barcode scanning.
 
 The book covers were created using Canva (https://www.canva.com/).
-All book cover images are from Unsplash (https://unsplash.com/), and have generously been placed in the public domain.
+All book cover images are from Unsplash (https://unsplash.com/), and have generously been may available for use free of charge.
 Inclusion in this work does not imply additional rights beyond those granted by the copyright holders.
 
 This overall project, as applicable, is released under terms of the Apache 2.0 License.
