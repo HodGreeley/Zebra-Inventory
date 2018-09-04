@@ -24,6 +24,7 @@ Run Couchbase Sync Gateway with the included configuration file.
 
 Open the android folder in Android Studio, build, and install the app on an appropriate Zebra device.
 (This application was originally built and test on a Zebra TC56 device.)
+The default database URL refers to localhost, so to test on a tethered device, set up port forwarding with `adb reverse tcp:4984 tcp:4984`.
 
 Scan the included barcodes.
 The one named "missing" has no associated book in the original data.
