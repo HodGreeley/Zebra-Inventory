@@ -3,8 +3,8 @@
 This application implements a simple inventory scanning capability.
 
 The data consists of information about a fictitious set of books.
-Scanning the included ISBN bar codes pulls up the information from the Couchbase Lite embedded database.
-It relies on the Zebra Datawedge service for ISBN barcode scanning.
+Scanning the included ISBN bar codes pulls up the information from the link:https://www.couchbase.com/products/lite[Couchbase Lite] embedded database.
+It relies on the link:https://www.zebra.com/us/en/products/software/mobile-computers/datawedge.html[Zebra Datawedge] service for ISBN barcode scanning.
 
 The book covers were created using Canva (https://www.canva.com/).
 All book cover images are from Unsplash (https://unsplash.com/), and have generously been placed in the public domain.
@@ -18,6 +18,7 @@ See `LICENSE` for details.
 Load the included data into Couchbase Server using link:https://developer.couchbase.com/documentation/server/current/cli/restore-cbrestore.html[`cbrestore`].
 Note the original export with cbbackup was done under macOS.
 There may be extra flags needed to restore the data under Linux or Windows.
+See the `cbrestore` documentation for details.
 
 Run Couchbase Sync Gateway with the included configuration file.
 
