@@ -42,12 +42,8 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-import static android.graphics.PorterDuff.Mode.CLEAR;
 import static android.graphics.PorterDuff.Mode.DST;
 import static android.graphics.PorterDuff.Mode.DST_OVER;
-import static android.graphics.PorterDuff.Mode.SRC;
-import static android.graphics.PorterDuff.Mode.SRC_ATOP;
-import static android.graphics.PorterDuff.Mode.SRC_OVER;
 
 public class ScanActivity extends AppCompatActivity {
     private static final String TAG = ScanActivity.class.getName();
