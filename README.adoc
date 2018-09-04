@@ -16,8 +16,9 @@ See `LICENSE` for details.
 == Instructions
 
 Load the included data into Couchbase Server using link:https://developer.couchbase.com/documentation/server/current/cli/restore-cbrestore.html[`cbrestore`].
+For example, on a standard Linux installation, use `/opt/couchbase/bin/cbrestore /<absolute path>/data http://localhost:8091 -u Administrator -p Password -x rehash=1`
 Note the original export with cbbackup was done under macOS.
-There may be extra flags needed to restore the data under Linux or Windows.
+Restoring under other operating systems requires the additional `-x rehash=1` option.
 See the `cbrestore` documentation for details.
 
 Run Couchbase Sync Gateway with the included configuration file.
