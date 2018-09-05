@@ -2,6 +2,10 @@
 
 This application implements a simple inventory scanning capability.
 
+:figure-caption!:
+.Screenshot
+image::screenshot.png[Screenshot, 200, align="center"]
+
 The data consists of information about a fictitious set of books.
 Scanning the included ISBN bar codes pulls up the information from the link:https://www.couchbase.com/products/lite[Couchbase Lite] embedded database.
 It relies on the link:https://www.zebra.com/us/en/products/software/mobile-computers/datawedge.html[Zebra Datawedge] service for ISBN barcode scanning.
