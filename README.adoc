@@ -1,4 +1,4 @@
-= Zebra Datawedge/Couchbase Mobile Integration Demo
+= Zebra DataWedge/Couchbase Mobile Integration Demo
 
 This application implements a simple inventory scanning capability.
 
@@ -8,7 +8,9 @@ image::screenshot.png[Screenshot, 200, align="center"]
 
 The data consists of information about a fictitious set of books.
 Scanning the included ISBN bar codes pulls up the information from the link:https://www.couchbase.com/products/lite[Couchbase Lite] embedded database.
-It relies on the link:https://www.zebra.com/us/en/products/software/mobile-computers/datawedge.html[Zebra Datawedge] service for ISBN barcode scanning.
+It relies on the link:https://www.zebra.com/us/en/products/software/mobile-computers/datawedge.html[Zebra DataWedge] service for ISBN barcode scanning.
+
+To learn more about integrating barcode scanning into your app visit https://developer.zebra.com.
 
 The book covers were created using Canva (https://www.canva.com/).
 All book cover images are from Unsplash (https://unsplash.com/), and have generously been may available for use free of charge.
@@ -19,11 +21,11 @@ See `LICENSE` for details.
 
 == Instructions
 
-Load the included data into Couchbase Server using link:https://developer.couchbase.com/documentation/server/current/cli/restore-cbrestore.html[`cbrestore`].
+Load the included data into Couchbase Server using `cbrestore`.
 For example, on a standard Linux installation, use `/opt/couchbase/bin/cbrestore /<absolute path>/data http://localhost:8091 -u Administrator -p Password -x rehash=1`
 Note the original export with cbbackup was done under macOS.
 Restoring under other operating systems requires the additional `-x rehash=1` option.
-See the `cbrestore` documentation for details.
+See the link:https://developer.couchbase.com/documentation/server/current/cli/restore-cbrestore.html[`cbrestore` documentation] for details.
 
 Run Couchbase Sync Gateway with the included configuration file.
 
