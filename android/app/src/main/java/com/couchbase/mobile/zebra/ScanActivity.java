@@ -73,6 +73,17 @@ public class ScanActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
 
+        thumbnail = findViewById(R.id.thumbnail);
+        title = findViewById(R.id.title);
+        author = findViewById(R.id.author);
+        isbn = findViewById(R.id.isbn);
+
+        thumbnail.setMinimumWidth(THUMBNAIL_WIDTH);
+        thumbnail.setMinimumHeight(THUMBNAIL_HEIGHT);
+        thumbnail.setBackgroundColor(Color.DKGRAY);
+
+        Button softScanButton = findViewById(R.id.buttonDWSoftScan);
+
         try {
             DatabaseConfiguration config = new DatabaseConfiguration(getApplicationContext());
             database = new Database("inventory", config);
@@ -87,17 +98,6 @@ public class ScanActivity extends AppCompatActivity {
         } catch(CouchbaseLiteException | URISyntaxException ex) {
             ex.printStackTrace();
         }
-
-        thumbnail = findViewById(R.id.thumbnail);
-        title = findViewById(R.id.title);
-        author = findViewById(R.id.author);
-        isbn = findViewById(R.id.isbn);
-
-        thumbnail.setMinimumWidth(THUMBNAIL_WIDTH);
-        thumbnail.setMinimumHeight(THUMBNAIL_HEIGHT);
-        thumbnail.setBackgroundColor(Color.DKGRAY);
-
-        Button softScanButton = findViewById(R.id.buttonDWSoftScan);
 
         softScanButton.setOnClickListener(view -> {
             Intent intent = new Intent();
