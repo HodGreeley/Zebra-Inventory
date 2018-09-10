@@ -1,5 +1,6 @@
 package com.couchbase.mobile.zebra;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -106,6 +107,7 @@ public class ScanActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("CheckResult")
     @Override
     protected void onResume() {
         super.onResume();
