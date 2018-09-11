@@ -121,6 +121,8 @@ public class ScanActivity extends AppCompatActivity {
 
         String isbn = intent.getStringExtra(DATAWEDGE_INTENT_DATA);
 
+        this.isbn.setText(isbn);
+
         Observable.create((ObservableOnSubscribe<Map<String, Object>>)source -> {
             List<Result> results = null;
             Map<String, Object> info;
@@ -166,7 +168,6 @@ public class ScanActivity extends AppCompatActivity {
 
         map.put("title", warning);
         map.put("author", warning);
-        map.put("isbn", warning);
 
         map.put("thumbnail", bitmapFromString(warning));
 
@@ -178,7 +179,6 @@ public class ScanActivity extends AppCompatActivity {
         thumbnail.setImageBitmap((Bitmap)info.get("thumbnail"));
         title.setText((String)info.get("title"));
         author.setText((String)info.get("author"));
-        isbn.setText((String)info.get("isbn"));
     }
 
     // Ref: https://stackoverflow.com/questions/11120392/android-center-text-on-canvas
