@@ -4,7 +4,7 @@ This application implements a simple inventory scanning capability.
 
 :figure-caption!:
 .Screenshot
-image::screenshot.png[Screenshot, 200, align="center"]
+image::application.png[Screenshot, 200, align="left"]
 
 The data consists of information about a fictitious set of books.
 Scanning the included ISBN bar codes pulls up the information from the link:https://www.couchbase.com/products/lite[Couchbase Lite] embedded database.
@@ -32,6 +32,20 @@ Run Couchbase Sync Gateway with the included configuration file.
 Open the android folder in Android Studio, build, and install the app on an appropriate Zebra device.
 (This application was originally built and test on a Zebra TC56 device.)
 The default database URL refers to localhost, so to test on a tethered device, set up port forwarding with `adb reverse tcp:4984 tcp:4984`.
+
+DataWedge uses an intent-based API.
+The application requires a corresponding DataWedge profile.
+Set up a profile as shown here and associate it with the application.
+
+[.float-group]
+--
+:figure-caption!:
+.Enable Scanning
+image::profile_1.png[Enable Scanning, 200, align="center", float="left"]
+:figure-caption!:
+.Enable Intents
+image::profile_2.png[Enable Intents, 200, align="center", float="left"]
+--
 
 Scan the included barcodes.
 The one named "missing" has no associated book in the original data.
