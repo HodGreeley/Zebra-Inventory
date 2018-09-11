@@ -107,6 +107,11 @@ public class ScanActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        setIntent(intent);
+    }
+
     @SuppressLint("CheckResult")
     @Override
     protected void onResume() {
@@ -156,11 +161,6 @@ public class ScanActivity extends AppCompatActivity {
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(this::display, Throwable::printStackTrace);
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        setIntent(intent);
     }
 
     private Map<String, Object> warning(String warning) {
