@@ -10,7 +10,8 @@
       "allow_conflicts": false,
       "revs_limit": 20,
       "enable_shared_bucket_access": true,
-      "import_docs": "continuous"
+      "import_docs": "continuous",
+      "num_index_replicas": 0
     }
   }
 }
