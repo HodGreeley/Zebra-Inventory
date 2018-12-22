@@ -5,4 +5,7 @@
     <string name="author_header">Author</string>
     <string name="isbn_header">ISBN</string>
     <string name="btn_scan">Scan</string>
+    <string name="title_activity_catalog">Catalog</string>
+    <string name="btn_sync">Sync</string>
+    <string name="btn_catalog">Catalog</string>
 </resources>

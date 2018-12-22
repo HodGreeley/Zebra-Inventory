@@ -1,0 +1,40 @@
+        Observable.create((ObservableOnSubscribe<Map<String, Object>>)source -> {
+            List<Result> results = null;
+            Map<String, Object> info;
+
+            Query query = QueryBuilder
+                    .select(SelectResult.all())
+                    .from(DataSource.database(database))
+                    .where(Expression.property("isbn").equalTo(Expression.string(isbn)));
+
+            try {
+                results = query.execute().allResults();
+            } catch(CouchbaseLiteException ex) {
+                source.onError((ex));
+            }
+
+            if (0 == results.size()) {
+                info = warning("Missing");
+            } else if (1 < results.size()) {
+                info = warning("Duplicate");
+            } else {
+                Result result = results.get(0);
+                info = result.toMap();
+
+                InputStream is = result.getBlob("cover").getContentStream();
+                Bitmap thumbnail = BitmapFactory.decodeStream(is);
+                info.put("thumbnail", thumbnail);
+            }
+
+            source.onNext(info);
+        })
+        .map((Function<? super Dictionary, ? extends Map<String, Object>>) result -> {
+            InputStream is = result.getBlob("cover").getContentStream();
+            Bitmap cover = BitmapFactory.decodeStream(is);
+
+            Map<String, Object> info = result.toMap();
+
+            info.put("thumbnail", cover);
+
+            return info;
+        })

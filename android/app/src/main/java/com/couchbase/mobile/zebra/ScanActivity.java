@@ -1,7 +1,9 @@
 package com.couchbase.mobile.zebra;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -10,44 +12,28 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.couchbase.lite.BasicAuthenticator;
-import com.couchbase.lite.CouchbaseLiteException;
-import com.couchbase.lite.DataSource;
-import com.couchbase.lite.Database;
-import com.couchbase.lite.DatabaseConfiguration;
 import com.couchbase.lite.Dictionary;
-import com.couchbase.lite.Endpoint;
-import com.couchbase.lite.Expression;
-import com.couchbase.lite.Query;
-import com.couchbase.lite.QueryBuilder;
-import com.couchbase.lite.Replicator;
-import com.couchbase.lite.ReplicatorConfiguration;
-import com.couchbase.lite.Result;
-import com.couchbase.lite.SelectResult;
-import com.couchbase.lite.URLEndpoint;
+import com.couchbase.lite.ResultSet;
 
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import io.reactivex.Observable;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static android.graphics.PorterDuff.Mode.DST;
 import static android.graphics.PorterDuff.Mode.DST_OVER;
 
 public class ScanActivity extends AppCompatActivity {
-    private static final String TAG = ScanActivity.class.getName();
+    private static final String TAG = ScanActivity.class.getSimpleName();
 
     private static final String DATAWEDGE_ACTION = "com.symbol.datawedge.api.ACTION";
     private static final String DATAWEDGE_SOFT_SCAN_TRIGGER = "com.symbol.datawedge.api.SOFT_SCAN_TRIGGER";
@@ -61,7 +47,8 @@ public class ScanActivity extends AppCompatActivity {
     private static final int THUMBNAIL_WIDTH = 245;
     private static final int THUMBNAIL_HEIGHT = 400;
 
-    private Database database;
+    private DataManager dataManager;
+    private Disposable disp = null;
 
     private ImageView thumbnail;
     private TextView title;
@@ -82,29 +69,21 @@ public class ScanActivity extends AppCompatActivity {
         thumbnail.setMinimumHeight(THUMBNAIL_HEIGHT);
         thumbnail.setBackgroundColor(Color.DKGRAY);
 
-        Button softScanButton = findViewById(R.id.buttonDWSoftScan);
-
-        try {
-            DatabaseConfiguration config = new DatabaseConfiguration(getApplicationContext());
-            database = new Database("inventory", config);
-
-            Endpoint targetEndpoint = new URLEndpoint(new URI("ws://localhost:4984/inventory"));
-            ReplicatorConfiguration repConfig = new ReplicatorConfiguration(database, targetEndpoint)
-                    .setReplicatorType(ReplicatorConfiguration.ReplicatorType.PUSH_AND_PULL)
-                    .setAuthenticator(new BasicAuthenticator("user", "password"))
-                    .setContinuous(true);
-            Replicator replicator = new Replicator(repConfig);
-            replicator.start();
-        } catch(CouchbaseLiteException | URISyntaxException ex) {
-            ex.printStackTrace();
-        }
-
-        softScanButton.setOnClickListener(view -> {
+        findViewById(R.id.buttonDWSoftScan).setOnClickListener(view -> {
             Intent intent = new Intent();
             intent.setAction(DATAWEDGE_ACTION);
             intent.putExtra(DATAWEDGE_SOFT_SCAN_TRIGGER, DATAWEDGE_TOGGLE_SCANNING);
             sendBroadcast(intent);
         });
+
+        findViewById(R.id.buttonP2PSync).setOnClickListener(view -> dataManager.startPeerReplication());
+
+        findViewById(R.id.buttonCatalog).setOnClickListener(view -> openCatalog());
+
+        dataManager = new DataManager(getApplicationContext());
+
+        dataManager.startServerReplication();
+        dataManager.initializePeerToPeer(getApplicationContext());
     }
 
     @Override
@@ -128,47 +107,69 @@ public class ScanActivity extends AppCompatActivity {
 
         this.isbn.setText(isbn);
 
-        Observable.create((ObservableOnSubscribe<Map<String, Object>>)source -> {
-            List<Result> results = null;
-            Map<String, Object> info;
+        disp = dataManager.fromQuery(dataManager.createISBNQuery(isbn))
+                .map(ResultSet::allResults)
+                .map(results -> {
+                    Map<String, Object> info;
 
-            Query query = QueryBuilder
-                    .select(SelectResult.all())
-                    .from(DataSource.database(database))
-                    .where(Expression.property("isbn").equalTo(Expression.string(isbn)));
+                    if (0 == results.size()) { return warning("Missing"); }
+                    if (1 < results.size()) { return warning("Duplicate"); }
 
-            try {
-                results = query.execute().allResults();
-            } catch(CouchbaseLiteException ex) {
-                source.onError((ex));
-            }
+                    Dictionary result = results.get(0).getDictionary(dataManager.getDatabase().getName());
+                    info = result.toMap();
 
-            if (0 == results.size()) {
-                info = warning("Missing");
-            } else if (1 < results.size()) {
-                info = warning("Duplicate");
-            } else {
-                Dictionary result = results.get(0).getDictionary(database.getName());
-                info = result.toMap();
+                    InputStream is = result.getBlob("cover").getContentStream();
+                    Bitmap thumbnail = BitmapFactory.decodeStream(is);
+                    info.put("thumbnail", thumbnail);
 
-                InputStream is = result.getBlob("cover").getContentStream();
-                Bitmap thumbnail = BitmapFactory.decodeStream(is);
-                info.put("thumbnail", thumbnail);
-            }
-
-            source.onNext(info);
-        })
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(this::display, Throwable::printStackTrace);
+                    return info;
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::display, Throwable::printStackTrace);
     }
 
-    private Map<String, Object> warning(String warning) {
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (null != disp) disp.dispose();
+    }
+
+    private static final String[] permissions = {
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.CHANGE_WIFI_STATE,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+    };
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, permissions, 1);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    private void openCatalog() {
+        Intent intent = new Intent(this, CatalogActivity.class);
+        startActivity(intent);
+    }
+
+    public static Map<String, Object> warning(String warning) {
         Map<String, Object> map = new HashMap<>();
 
         map.put("title", warning);
         map.put("author", warning);
-
         map.put("thumbnail", bitmapFromString(warning));
 
         return map;
@@ -186,7 +187,7 @@ public class ScanActivity extends AppCompatActivity {
     private static final int WARNING_BACKGROUND = Color.DKGRAY;
     private static final float WARNING_SIZE = 38f;
 
-    private Bitmap bitmapFromString(String text) {
+    private static Bitmap bitmapFromString(String text) {
         Bitmap bitmap = Bitmap.createBitmap(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint();
