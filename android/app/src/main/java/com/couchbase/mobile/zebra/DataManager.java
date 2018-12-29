@@ -31,7 +31,6 @@ import java.util.Map;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 
 public class DataManager implements ConnectionManager.ConnectionListener {
     private static String TAG = DataManager.class.getName();
@@ -61,10 +60,10 @@ public class DataManager implements ConnectionManager.ConnectionListener {
         return database;
     }
 
-    public Observable<ResultSet> fromQuery(Query query) {
-        return Observable.create(emitter -> {
+    public Flowable<ResultSet> fromQuery(Query query) {
+        return Flowable.create(emitter -> {
             QueryChangeListener listener = change -> {
-                if (emitter.isDisposed()) return;
+                if (emitter.isCancelled()) return;
 
                 emitter.onNext(change.getResults());
             };
@@ -74,7 +73,7 @@ public class DataManager implements ConnectionManager.ConnectionListener {
             emitter.setCancellable(() -> query.removeChangeListener(lt));
 
             query.execute();
-        });
+        }, BackpressureStrategy.LATEST);
     }
 
     public Query createISBNQuery(String isbn) {
